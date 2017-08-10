@@ -6,15 +6,19 @@ RUN apt-get update && apt-get upgrade --yes && \
 	apt-get install -y wget && \
 	apt-get install --yes bc vim libxpm4 libXext6 libXt6 libXmu6 libXp6 zip unzip
 
+RUN mkdir /build
+COPY Dockerfile /build/Dockerfile
+
 RUN apt-get update && apt-get upgrade --yes && \
     apt-get install build-essential --yes && \
-    apt-get install python-dev groff  --yes && \
-    apt-get install default-jre --yes && \
-    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py && \
-    apt-get install software-properties-common --yes && \
-    add-apt-repository ppa:fkrull/deadsnakes-python2.7 --yes && \
-    apt-get update --yes && \
-    apt-get install python2.7 --yes && \
+    apt-get install python-dev groff  --yes --force-yes && \
+    apt-get install default-jre --yes --force-yes && \
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py  && \
+    apt-get install software-properties-common --yes --force-yes && \
+    add-apt-repository ppa:fkrull/deadsnakes-python2.7 --yes 
+
+RUN    apt-get update --yes --force-yes && \
+    apt-get install python2.7 --yes --force-yes && \
     python get-pip.py 
 
 RUN pip install awscli 
@@ -28,8 +32,7 @@ COPY runLocal.sh /usr/local/bin/runLocal.sh
 COPY run-with-env.sh /usr/local/bin/run-with-env.sh
 
 RUN mkdir /home/gistic/MCRInstaller
-#COPY MCRInstaller.zip.2014a /home/gistic/MCRInstaller/MCRInstaller.zip
-# COPY environment /etc/environment
+
 RUN cd /home/gistic/MCRInstaller && \
    wget https://www.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip && \
    unzip MCR_R2014a_glnxa64_installer.zip
