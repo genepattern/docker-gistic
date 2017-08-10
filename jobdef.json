@@ -19,7 +19,7 @@
                 "value": "stdout.txt"
             }
         ],
-        "image": "liefeld/gistic",
+        "image": "genepattern/docker-gistic:2.0.23",
         "memory": 200,
         "mountPoints": [],
         "ulimits": [],
