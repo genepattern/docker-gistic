@@ -6,14 +6,14 @@
 #
 # current arg is just job #
 #
-TEST_ROOT=/Users/liefeld/GenePattern/gp_dev/genepattern-server/resources/wrapper_scripts/docker/aws_batch/containers/gistic/tests/gistic_2_23
+TEST_ROOT=$PWD
 TASKLIB=$TEST_ROOT/src
 INPUT_FILE_DIRECTORIES=$TEST_ROOT/data
 JOB_DEFINITION_NAME="Gistic_2_0_23"
 JOB_ID=gp_job_gistic_2023_$1
 JOB_QUEUE=TedTest
 S3_ROOT=s3://moduleiotest
-WORKING_DIR=$TEST_ROOT/job_12345
+WORKING_DIR=$TEST_ROOT/job_32345
 
 
 #
@@ -28,7 +28,7 @@ COMMAND_LINE="$TASKLIB/gp_gistic2_from_seg -b . -seg $INPUT_FILE_DIRECTORIES/seg
 
 mkdir -p $WORKING_DIR
 mkdir -p $WORKING_DIR/.gp_metadata
-EXEC_SHELL=$WORKING_DIR/.gp_metadata/local_exec.sh
+EXEC_SHELL=$WORKING_DIR/.gp_metadata/exec.sh
 
 echo "#!/bin/bash\n" > $EXEC_SHELL
 echo $COMMAND_LINE >>$EXEC_SHELL
@@ -37,7 +37,7 @@ echo "\n " >>$EXEC_SHELL
 chmod a+x $EXEC_SHELL
 aws s3 sync $WORKING_DIR/.gp_metadata $S3_ROOT$WORKING_DIR/.gp_metadata --profile genepattern
 
-REMOTE_COMMAND="runLocal.sh $TASKLIB $INPUT_FILE_DIRECTORIES $S3_ROOT $WORKING_DIR $EXEC_SHELL"
+REMOTE_COMMAND="runS3OnBatch.sh  $TASKLIB $INPUT_FILE_DIRECTORIES $S3_ROOT $WORKING_DIR $EXEC_SHELL"
 
 aws batch submit-job \
       --job-name $JOB_ID \
