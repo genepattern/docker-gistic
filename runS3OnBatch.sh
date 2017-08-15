@@ -21,6 +21,10 @@ WORKING_DIR="$(echo -e "${4}" | tr -d '[:space:]')"
 : ${STDOUT_FILENAME=stdout.txt}
 : ${STDERR_FILENAME=stderr.txt}
 
+echo STDERR=$STDERR_FILENAME
+echo STDOUT=$STDOUT_FILENAME
+echo GP_METADATA_DIR=$GP_METADATA_DIR
+
 # 
 # args 6 and beyond are passed into the module
 #
@@ -49,7 +53,7 @@ echo "3a synching gp_metadata_dir"
 aws s3 sync $S3_ROOT$GP_METADATA_DIR $GP_METADATA_DIR 
 
 
-chmod a+x $WORKING_DIR/.gp_metadata/*
+chmod a+x $GP_METADATA_DIR/*
 cd $WORKING_DIR 
 
 #shift args to pass the remainder to the executable module code
@@ -66,4 +70,6 @@ runMatlab.sh $@ >$STDOUT_FILENAME 2>$STDERR_FILENAME
 aws s3 sync . $S3_ROOT$WORKING_DIR --quiet
 
 aws s3 sync $GP_METADATA_DIR $S3_ROOT$GP_METADATA_DIR --quiet
+
+
 
