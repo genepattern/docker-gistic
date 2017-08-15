@@ -16,6 +16,8 @@ WORKING_DIR="$(echo -e "${4}" | tr -d '[:space:]')"
 #
 # assign filenames for STDOUT and STDERR if not already set
 #
+: ${GP_METADATA_DIR=$WORKING_DIR/.gp_metadata}
+: ${EXITCODE_FILENAME=$GP_METADATA_DIR/exit_code.txt}
 : ${STDOUT_FILENAME=stdout.txt}
 : ${STDERR_FILENAME=stderr.txt}
 
@@ -42,8 +44,11 @@ aws s3 sync $S3_ROOT$INPUT_FILES_DIR $INPUT_FILES_DIR
 ls $INPUT_FILES_DIR
 
 # switch to the working directory
-mkdir -p $WORKING_DIR/.gp_metadata
-aws s3 sync $S3_ROOT$WORKING_DIR/.gp_metadata $WORKING_DIR/.gp_metadata
+mkdir -p $GP_METADATA_DIR
+echo "3a synching gp_metadata_dir"
+aws s3 sync $S3_ROOT$GP_METADATA_DIR $GP_METADATA_DIR 
+
+
 chmod a+x $WORKING_DIR/.gp_metadata/*
 cd $WORKING_DIR 
 
@@ -58,5 +63,7 @@ echo $@
 runMatlab.sh $@ >$STDOUT_FILENAME 2>$STDERR_FILENAME
 
 # send the generated files back
-aws s3 sync . $S3_ROOT$WORKING_DIR 
+aws s3 sync . $S3_ROOT$WORKING_DIR --quiet
+
+aws s3 sync $GP_METADATA_DIR $S3_ROOT$GP_METADATA_DIR --quiet
 
