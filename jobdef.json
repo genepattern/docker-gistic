@@ -9,19 +9,6 @@
             "Ref::exe1"
         ],
         "jobRoleArn": "arn:aws:iam::718039241689:role/BATCH-EFS-ROLE",
-        "environment": [
-           {
-                "name": "GP_METADATA_DIR",
-                "value": "./.gp_metadata"
-            },            {
-                "name": "STDOUT_FILENAME",
-                "value": "stdout.txt"
-            },
-            {
-                "name": "STDOUT_FILENAME",
-                "value": "stdout.txt"
-            }
-        ],
         "image": "genepattern/docker-gistic:2.0.23",
         "memory": 200,
         "mountPoints": [],
