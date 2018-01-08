@@ -1,3 +1,4 @@
+# copyright 2017-2018 Regents of the University of California and the Broad Institute. All rights reserved.
 FROM ubuntu:14.04
 
 # Note: FROM java and FROM r-base work too but take much longer apt-get updating

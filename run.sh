@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# copyright 2017-2018 Regents of the University of California and the Broad Institute. All rights reserved.
 
 # (these may be set permanently by copying the above lines into your login script)
 

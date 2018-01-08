@@ -1,4 +1,5 @@
 #!/bin/bash
+# copyright 2017-2018 Regents of the University of California and the Broad Institute. All rights reserved.
 
 # strip off any arguments meant for the old run-with-env.sh script since
 # any environment stuff should be st up by/within the container

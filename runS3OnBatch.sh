@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# copyright 2017-2018 Regents of the University of California and the Broad Institute. All rights reserved.
 
 # this setup wrecks the aws cli so its done in run.sh instead
 # setup for the MCRInstaller
