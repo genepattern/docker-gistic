@@ -54,6 +54,18 @@ aws s3 sync $S3_ROOT$GP_METADATA_DIR $GP_METADATA_DIR
 
 
 chmod a+x $GP_METADATA_DIR/*
+
+# RUN Peter's file for additional S3 fetches
+if [ -f "$GP_METADATA_DIR/aws-sync-from-s3.sh" ]
+then
+    echo "==Running Peter's s3 script ==="
+    . $GP_METADATA_DIR/aws-sync-from-s3.sh
+    mv $GP_METADATA_DIR/aws-sync-from-s3.sh $GP_METADATA_DIR/aws-sync-from-s3_HOLD.sh
+    echo "# stubbed out to prevent call from inside inner container" > $GP_METADATA_DIR/aws-sync-from-s3.sh
+    chmod a+x $GP_METADATA_DIR/aws-sync-from-s3.sh
+    echo "===Stubbed out S3 script "
+fi
+
 cd $WORKING_DIR 
 
 #shift args to pass the remainder to the executable module code
