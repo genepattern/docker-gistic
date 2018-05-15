@@ -43,6 +43,15 @@ RUN  chmod a+x /usr/local/bin/runMatlab.sh && \
 	cd MCRInstaller && \
      	/home/gistic/MCRInstaller/install -mode silent -agreeToLicense yes 
 
+# (these may be set permanently by copying the above lines into your login script)
+
+ENV LD_LIBRARY_PATH=/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/bin/glnxa64:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/sys/os/glnxa64:$LD_LIBRARY_PATH
+
+
+
+#Next, set the XAPPLRESDIR environment variable to the following value:
+
+ENV XAPPLRESDIR=/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/X11/app-defaults
 
 
 CMD ["/bin/bash", "runMatlab.sh"]
