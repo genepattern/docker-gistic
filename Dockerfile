@@ -42,6 +42,7 @@ COPY matlab.conf /etc/ld.so.conf.d/matlab.conf
 RUN  chmod a+x /usr/local/bin/runMatlab.sh && \
 	cd MCRInstaller && \
      	/home/gistic/MCRInstaller/install -mode silent -agreeToLicense yes 
+COPY module/gp_gistic2_from_seg /usr/local/bin/gp_gistic2_from_seg
 
 CMD ["/bin/bash", "runMatlab.sh"]
 
