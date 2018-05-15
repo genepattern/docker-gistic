@@ -1,49 +1,51 @@
 # copyright 2017-2018 Regents of the University of California and the Broad Institute. All rights reserved.
 FROM ubuntu:14.04
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    zip \
+    unzip \
+    xorg \
+ && rm -rf /var/lib/apt/lists/*
 
-# Note: FROM java and FROM r-base work too but take much longer apt-get updating
+# Install Matlab Component Runtime
+#   -u matlab-mcr/2014a
+# MATLAB Release: R2014a (8.3)
+# MATLAB Component Runtime (MCR): 8.3
+# MATLAB Compiler Version: 5.1
+#
 
-RUN apt-get update && apt-get upgrade --yes && \ 
-	apt-get install -y wget && \
-	apt-get install --yes bc vim libxpm4 libXext6 libXt6 libXmu6 libXp6 zip unzip
+ENV mcr_base=/opt/matlab-mcr
+ENV mcr_install_dir=${mcr_base}_install
+ENV mcr_ver=v83
+ENV mcr_root=${mcr_base}/${mcr_ver}
 
-RUN apt-get update && apt-get upgrade --yes && \
-    apt-get install build-essential --yes && \
-    apt-get install python-dev groff  --yes --force-yes && \
-    apt-get install default-jre --yes --force-yes && \
-    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py  && \
-    apt-get install software-properties-common --yes --force-yes && \
-    add-apt-repository ppa:fkrull/deadsnakes-python2.7 --yes 
+RUN mkdir -p ${mcr_base}
+RUN mkdir -p ${mcr_install_dir}
 
-RUN    apt-get update --yes --force-yes && \
-    apt-get install python2.7 --yes --force-yes && \
-    python get-pip.py 
+WORKDIR ${mcr_install_dir}
+RUN cd ${mcr_install_dir} && \
+  wget https://www.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip && \
+  unzip MCR_R2014a_glnxa64_installer.zip
 
-RUN pip install awscli 
+RUN ${mcr_install_dir}/install -mode silent -agreeToLicense yes -destinationFolder ${mcr_base}
 
-RUN mkdir /home/gistic
-WORKDIR /home/gistic
+#
+# Install GISTIC 2.0.23
+#
+ENV GISTIC_HOME=/opt/gistic/2.0.23
+RUN mkdir -p ${GISTIC_HOME}
+WORKDIR ${GISTIC_HOME}
 
-RUN mkdir /home/gistic/MCRInstaller
+RUN wget -qO- ftp://ftp.broadinstitute.org/pub/GISTIC2.0/GISTIC_2_0_23.tar.gz \
+  | tar xvz -C /opt/gistic/2.0.23
 
-RUN cd /home/gistic/MCRInstaller && \
-   wget https://www.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip && \
-   unzip MCR_R2014a_glnxa64_installer.zip
+# Configure environment variables for MCR
 
-RUN mkdir /build
-COPY Dockerfile /build/Dockerfile
+ENV PATH=${GISTIC_HOME}:${PATH}
+ENV LD_LIBRARY_PATH=/opt/matlab-mcr/v83/runtime/glnxa64:/opt/matlab-mcr/v83/bin/glnxa64:/opt/matlab-mcr/v83/sys/os/glnxa64
+ENV XAPPLRESDIR /opt/mcr/v90/X11/app-defaults
 
-COPY runMatlab.sh /usr/local/bin/runMatlab.sh
-COPY runS3OnBatch.sh /usr/local/bin/runS3OnBatch.sh
-COPY runLocal.sh /usr/local/bin/runLocal.sh
-COPY run-with-env.sh /usr/local/bin/run-with-env.sh
-COPY matlab.conf /etc/ld.so.conf.d/matlab.conf
+RUN rm -rf ${matlab-mcr_install}
 
-RUN  chmod a+x /usr/local/bin/runMatlab.sh && \
-	cd MCRInstaller && \
-     	/home/gistic/MCRInstaller/install -mode silent -agreeToLicense yes 
-
-
-
-CMD ["/bin/bash", "runMatlab.sh"]
-
+CMD ["${GISTIC_HOME}/gp_gistic2_from_seg"]
