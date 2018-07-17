@@ -1,0 +1,73 @@
+FROM centos:6.9
+
+RUN yum -y install \
+  wget \
+  curl \
+  zip \
+  unzip \
+  libXext \
+  libXt \
+  libXmu \
+  libXp \
+  libXpm \
+&& yum clean all
+
+#
+# Install Matlab Component Runtime (mcr)
+#   <run-with-env> -u matlab-mcr/2014a ...
+#   MATLAB Release: R2014a (8.3)
+#   MATLAB Component Runtime (MCR): 8.3
+#   MATLAB Compiler Version: 5.1
+#
+
+ENV MCR_ROOT /opt/matlab-mcr
+ENV MCR_VER v83
+RUN set -o pipefail \
+  && mkdir -p ${MCR_ROOT} \
+  && mkdir -p ${MCR_ROOT}/${MCR_VER} \
+  && mkdir -p ${MCR_ROOT}_install \
+  && cd ${MCR_ROOT}_install/ \
+  && curl -O https://www.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip \
+  && unzip MCR_R2014a_glnxa64_installer.zip \
+  && ./install -mode silent -agreeToLicense yes -destinationFolder ${MCR_ROOT}
+
+#
+# set mcr environment variables
+#
+# from the mcr documentation
+#
+#ENV LD_LIBRARY_PATH \
+# ${MCR_ROOT}/${MCR_VER}/bin/glnxa64\
+#:${MCR_ROOT}/${MCR_VER}/sys/java/jre/glnxa64/jre/lib/amd64\
+#:${MCR_ROOT}/${MCR_VER}/sys/java/jre/glnxa64/jre/lib/amd64/server\
+#:${MCR_ROOT}/${MCR_VER}/sys/java/jre/glnxa64/jre/lib/amd64/jli\
+#:${MCR_ROOT}/${MCR_VER}/sys/os/glnxa64\
+#:${MCR_ROOT}/${MCR_VER}/bin/glnxa64\
+#:${MCR_ROOT}/${MCR_VER}/runtime/glnxa64
+#
+# from the 'run_gistic_example' script
+#
+ENV LD_LIBRARY_PATH \
+ ${MCR_ROOT}/${MCR_VER}/sys/os/glnxa64\
+:${MCR_ROOT}/${MCR_VER}/bin/glnxa64\
+:${MCR_ROOT}/${MCR_VER}/runtime/glnxa64
+
+ENV XAPPLRESDIR ${MCR_ROOT}/${MCR_VER}/X11/app-defaults
+
+#
+# Install GISTIC 2.0.23
+#
+ENV GISTIC_HOME=/opt/gistic/2.0.23
+
+RUN set -o pipefail \
+  && mkdir -p ${GISTIC_HOME} \
+  && cd ${GISTIC_HOME} \
+  && wget -qO- ftp://ftp.broadinstitute.org/pub/GISTIC2.0/GISTIC_2_0_23.tar.gz \
+  | tar xvz -C ${GISTIC_HOME} \
+  && rm -rf ${GISTIC_HOME}/MCR_Installer/ \
+  && rmdir ${GISTIC_HOME}/MATLAB_Compiler_Runtime/
+
+ENV PATH=${GISTIC_HOME}:${PATH}
+
+WORKDIR ${GISTIC_HOME}
+#CMD ["${GISTIC_HOME}/gp_gistic2_from_seg"]
